@@ -1,0 +1,19 @@
+{
+	"name": "restaurant-info",
+	"author": "Choi Lok Fai <s1149346@ouhk.edu.hk>",
+	"version": "0.0.1",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"dependencies": {
+		"mongodb": "*",
+        	"express": "*",
+        	"ejs": "*",
+		"cfenv": "*",
+		"express-fileupload": "*",
+		"cookie-session": "*",
+		"body-parser":"*"
+	},
+	"repository": {},
+	"engines": "*"
+}

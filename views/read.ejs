@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title>Restaurant</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+</head>
+<body>
+<header class="w3-container w3-teal">
+	<h1>Restaurants</h1>
+	<p>User: <%=id%></p>
+	<p>Showing <%=r.length%> documents</p>
+</header>
+<div class="w3-container">
+<a class="w3-btn w3-section w3-black w3-ripple" href="/new"> New </a>
+<ul class="w3-ul w3-large">
+<% r.forEach(function(restaurant){ %>
+<li><a href=/display?_id=<%= restaurant._id %>><%= restaurant.name %></a></li>
+<% }); %>
+</ul>
+</div>
+</body>
+</html>
