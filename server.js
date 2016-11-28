@@ -159,6 +159,7 @@ app.get('/new',function(req,res){
 
 app.post('/create',function(req,res){
 	if(req.session.id!=null&&req.body.name!=null){
+var sampleFile;
 		MongoClient.connect(mongourl,function(err,db){
 			assert.equal(null,err);
 			console.log('from /new to /create\nConnected to mlab.com');
@@ -238,6 +239,8 @@ function reg(db,body,callback){
 function create(db,req,callback){
 	console.log(req.body);
 		db.collection('cloudass_restaurant').insertOne({
+			"data":new Buffer(req.files.sampleFile.data).toString('base64'),
+			"mimetype" : req.files.sampleFile.mimetype,
 			"name":req.body.name,
 			"borough":req.body.borough,
 			"cuisine":req.body.cuisine,
