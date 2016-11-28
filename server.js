@@ -162,7 +162,7 @@ app.post('/create',function(req,res){
 		MongoClient.connect(mongourl,function(err,db){
 			assert.equal(null,err);
 			console.log('from /new to /create\nConnected to mlab.com');
-			create(db,req.body,function(state){
+			create(db,req,function(state){
 				db.close();
 				console.log('Disconnected to mlab.com');
 				res.render("processreg.ejs",{state:state});
@@ -235,26 +235,27 @@ function reg(db,body,callback){
 	});
 }
 
-function create(db,body,callback){
-	console.log(body);
-	
-			db.collection('cloudass_restaurant').insertOne({
-				"name":body.name,
-				"borough":body.borough,
-				"cuisine":body.cuisine,
-				"street":body.street,
-				"building":body.building,
-				"zipcode":body.zipcode,
-				"lon":body.lon,
-				"lat":body.lat
-			},function(err,result){
-				if(err){
-					countstate="Registration false as server error!";
-				}else{
-					countstate="Registration success!";
-				}
-				callback(countstate);
-			});
+function create(db,req,callback){
+	console.log(req.body);
+		db.collection('cloudass_restaurant').insertOne({
+			"name":req.body.name,
+			"borough":req.body.borough,
+			"cuisine":req.body.cuisine,
+			"street":req.body.street,
+			"building":req.body.building,
+			"zipcode":req.body.zipcode,
+			"lon":req.body.lon,
+			"lat":req.body.lat,
+			"rating":"",
+			"owner":req.session.id
+		},function(err,result){
+			if(err){
+				countstate="Registration false as server error!";
+			}else{
+				countstate="Registration success!";
+			}
+			callback(countstate);
+		});
 		
 }
 
