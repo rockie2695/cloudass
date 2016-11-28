@@ -163,10 +163,10 @@ var sampleFile;
 		MongoClient.connect(mongourl,function(err,db){
 			assert.equal(null,err);
 			console.log('from /new to /create\nConnected to mlab.com');
-			create(db,req,function(state){
+			create(db,req,function(state,objid){
 				db.close();
 				console.log('Disconnected to mlab.com');
-				res.render("processreg.ejs",{state:state});
+				res.render("processcreate.ejs",{state:state,objid:objid});
 			});
 		});
 	}else{
@@ -264,12 +264,19 @@ function create(db,req,callback){
 			"rating":"",
 			"owner":req.session.id
 		},function(err,result){
+			var objid=null;
 			if(err){
-				countstate="Registration false as server error!";
+				countstate="Add restaurant false as server error!";
+				callback(countstate,objid);
 			}else{
-				countstate="Registration success!";
+				countstate="Add restaurant success!";
+				db.collection('cloudass_restaurant').findOne(req.body,function(err,result){
+						assert.equal(err,null);
+						objid=result._id;
+				callback(countstate,objid);
+					});
 			}
-			callback(countstate);
+			
 		});
 		
 }
