@@ -144,8 +144,8 @@ app.get('/display',function(req,res){
 			});
 		});
 	}else{
-		res.redirect('/login');
-		console.log('from /display to /login');
+		res.redirect('/read');
+		console.log('from /display to /read');
 	}
 });
 
@@ -153,7 +153,7 @@ app.get('/new',function(req,res){
 	if(req.session.id!=null){
 		res.render("new.ejs");
 	}else{
-		res.redirect("/login");
+		res.redirect("/read");
 	}
 });
 
@@ -170,9 +170,21 @@ var sampleFile;
 			});
 		});
 	}else{
-		res.redirect("/login");
+		res.redirect("/read");
 	}
 });
+
+app.get('/gmap',function(req,res){
+	if(req.session.id!=null&&req.query.lat!=null&&req.query.lon!=null&&req.query.title!=null){
+		var lat  = req.query.lat;
+		var lon  = req.query.lon;
+		var title = req.query.title;
+		res.render("gmap.ejs",{lat:lat,lon:lon,zoom:16,title:title});
+		res.end();
+	}else{
+		res.redirect("/read");
+	}
+})
 
 app.get('/logout',function(req,res){
 	req.session = null;
