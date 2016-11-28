@@ -32,6 +32,11 @@ app.use(session({
 	keys: [SECRETKEY1,SECRETKEY2],
 	maxAge:60*60*1000//60mins
 }));
+/*
+app.use(bodyParser.urlencoded({
+	extended:false
+}));
+*/
 
 app.get("/", function(req,res) {	
 	if(req.session.id==null){
@@ -191,6 +196,24 @@ app.get('/logout',function(req,res){
 	res.redirect('/login');
 });
 
+app.get('/api/read/:field/:value',function(req,res){
+	var field=req.params.field;
+	var value=req.params.value;
+	var criteria={field:value};
+	var criteria=JSON.stringify(criteria);
+	console.log(field+"\n"+value+"\n"+criteria);
+	MongoClient.connect(mongourl,function(err,db){
+		assert.equal(null,err);
+		console.log('from /new to /create\nConnected to mlab.com');
+		test1(db,function(restaurant){
+			db.close();
+			res.json(restaurant);
+		});
+	});
+});
+
+
+
 app.get(/.*/, function(req,res) {
 	res.status(404).end(req.url+' Not Supported');
 });
@@ -276,9 +299,23 @@ function create(db,req,callback){
 				callback(countstate,objid);
 					});
 			}
-			
 		});
-		
+}
+
+function test1(db,callback){
+	var restaurants=[];
+	db.collection('cloudass_restaurant').find({"name":"aa"},function(err,result){
+		assert.equal(err,null);
+	//res.json(result);
+
+	result.each(function(err,doc){
+			if(doc!=null){
+				restaurants.push(doc);
+			}else{
+				callback(restaurants);
+			}	
+		});
+	});
 }
 
 function findNRestaurant(db,callback){
