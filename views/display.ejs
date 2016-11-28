@@ -8,7 +8,7 @@
 <header class="w3-container w3-teal">
 	<h1><%=r.name%></h1>
 </header>
-<br>
+<img src="data:<%=r.mimetype%>;base64,<%=r.data%>" class="w3-image w3-border w3-padding" style="width:100%">
 <div class="w3-container">
 	<p><label class="w3-label w3-validate">Borough: </label><%=r.borough%></p>
 	<p><label class="w3-label w3-validate">Cuisine: </label><%=r.cuisine%></p>
