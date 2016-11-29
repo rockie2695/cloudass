@@ -197,22 +197,58 @@ app.get('/logout',function(req,res){
 });
 
 app.get('/api/read/:field/:value',function(req,res){
-	var field=req.params.field;
-	var value=req.params.value;
-	var criteria={field:value};
-	var criteria=JSON.stringify(criteria);
-	console.log(field+"\n"+value+"\n"+criteria);
+	field=req.params.field;
+	value=req.params.value;
+	criteria={};
+	criteria[field]=value;
 	MongoClient.connect(mongourl,function(err,db){
 		assert.equal(null,err);
 		console.log('from /new to /create\nConnected to mlab.com');
-		test1(db,function(restaurant){
+		apiread(db,criteria,function(restaurant){
 			db.close();
 			res.json(restaurant);
 		});
 	});
 });
 
+//you could test by(you may type it again as the code write on browser, some code convert problem may access)    curl -X POST --data '{"name":"curl"}' --header Content-Type:application/json http://localhost:6001/api/create -v
+app.post('/api/create',function(req,res){
+	MongoClient.connect(mongourl,function(err,db){
+		assert.equal(null,err);
+		db.collection('cloudass_restaurant').insertOne({
+			"data":"",
+			"mimetype" :"",
+			"name":req.body.name,
+			"borough":req.body.borough,
+			"cuisine":req.body.cuisine,
+			"street":req.body.street,
+			"building":req.body.building,
+			"zipcode":req.body.zipcode,
+			"lon":req.body.lon,
+			"lat":req.body.lat,
+			"rating":"",
+			"owner":req.body.id
+		},function(err,result){
+			array={};
+			var objid=null;
+			if(err){
+				countstate="failed";
+				array["status"]=countstate;
+				res.send(array);
+			}else{
+				countstate="ok";
+				array["status"]=countstate;
+				db.collection('cloudass_restaurant').findOne(req.body,function(err,result){
+					assert.equal(err,null);
+					objid=result._id;
+					array["_id"]=objid;
+					res.send(array);
+				});
+			}
+		});
 
+	});
+});
 
 app.get(/.*/, function(req,res) {
 	res.status(404).end(req.url+' Not Supported');
@@ -302,13 +338,11 @@ function create(db,req,callback){
 		});
 }
 
-function test1(db,callback){
+function apiread(db,criteria,callback){
 	var restaurants=[];
-	db.collection('cloudass_restaurant').find({"name":"aa"},function(err,result){
+	db.collection('cloudass_restaurant').find(criteria,function(err,result){
 		assert.equal(err,null);
-	//res.json(result);
-
-	result.each(function(err,doc){
+		result.each(function(err,doc){
 			if(doc!=null){
 				restaurants.push(doc);
 			}else{
