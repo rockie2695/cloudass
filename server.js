@@ -250,6 +250,51 @@ app.post('/api/create',function(req,res){
 	});
 });
 
+app.get('/rate',function(req,res){
+	if(req.session.id!=null&&req.query._id!=null){
+		res.render("rate.ejs",{_id:req.query._id});
+		res.end();
+	}else{
+		res.render("read.ejs");
+	}
+});
+
+app.post('/rate',function(req,res){
+	if(req.session.id!=null&&req.body._id!=null&&req.body.score!=null){
+		MongoClient.connect(mongourl,function(err,db){
+			assert.equal(null,err);
+			db.collection('cloudass_restaurant').aggregate(
+				[
+					{$match:{"rating.username":req.session.id,"_id":ObjectId(req.query._id)}},
+					{$group:{"_id":null,"count":{$sum:1}}}
+				]
+			).toArray(function(err,result){
+				assert.equal(err,null);
+				console.log(result);
+				if(result[0]==null){
+					count="0";
+				}else{
+					count=result[0].count;
+				}
+				if(count==0){
+					console.log('a'+req.query._id+req.session.id+req.body.score);
+					//"rating.username":req.session.id,"rating.rating":req.body.score
+					db.collection('cloudass_restaurant').update(
+						{"_id":ObjectId(req.query._id)},
+						{$push:{"rating":{"username":req.session.id,"rating":req.body.score}}},
+						{multi:false}
+					)
+					res.render("processrate.ejs",{state:'success',color:'teal'});
+				}else{
+					res.render("processrate.ejs",{state:'error',color:'red'});
+				}
+			}); 
+		}); 
+	}else{
+		res.render("read.ejs");
+	}
+});
+
 app.get(/.*/, function(req,res) {
 	res.status(404).end(req.url+' Not Supported');
 });
@@ -320,7 +365,7 @@ function create(db,req,callback){
 			"zipcode":req.body.zipcode,
 			"lon":req.body.lon,
 			"lat":req.body.lat,
-			"rating":"",
+			"rating":[],
 			"owner":req.session.id
 		},function(err,result){
 			var objid=null;
