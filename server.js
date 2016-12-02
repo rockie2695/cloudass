@@ -242,7 +242,7 @@ app.post('/api/create',function(req,res){
 					assert.equal(err,null);
 					objid=result._id;
 					array["_id"]=objid;
-					res.send(array);
+					res.json(array);
 				});
 			}
 		});
