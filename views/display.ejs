@@ -18,7 +18,11 @@
 	<p><label class="w3-label w3-validate">Building: </label><%=r.building%></p>
 	<p><label class="w3-label w3-validate">Zipcode: </label><%=r.zipcode%></p>
 	<p><label class="w3-label w3-validate">GPS: </label>[<%=r.lon%>,<%=r.lat%>]</p>
-	<p><label class="w3-label w3-validate">Rating: </label><%=r.rating%></p>
+	<p><label class="w3-label w3-validate">Rating: </label><ol>
+<% r.rating.forEach(function(rating){ %>
+<li><%= rating.rating %> (<%= rating.username %>)</a></li>
+<% }); %>
+</ol></p>
 	<p><label class="w3-label w3-validate">Created by: </label><%=r.owner%></p>
 </div>
 <% if(r.lat!=null&&r.lon!=null&&r.lat!=""&&r.lon!=""){ %>
