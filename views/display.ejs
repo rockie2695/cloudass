@@ -19,14 +19,32 @@
 	<p><label class="w3-label w3-validate">Zipcode: </label><%=r.zipcode%></p>
 	<p><label class="w3-label w3-validate">GPS: </label>[<%=r.lon%>,<%=r.lat%>]</p>
 	<p><label class="w3-label w3-validate">Rating: </label><ol>
+<% if(r.rating!=null&&r.rating!=""&&r.rating!={}){ %>
 <% r.rating.forEach(function(rating){ %>
 <li><%= rating.rating %> (<%= rating.username %>)</a></li>
 <% }); %>
+<% } %>
 </ol></p>
 	<p><label class="w3-label w3-validate">Created by: </label><%=r.owner%></p>
 </div>
 <% if(r.lat!=null&&r.lon!=null&&r.lat!=""&&r.lon!=""){ %>
 <a href="/gmap?lat=<%=r.lat%>&lon=<%=r.lon%>&title=<%=r.name%>">Google Map</a>
 <% } %>
+
+<div class="w3-container">
+<a href="/rate?_id=<%=r._id%>" style="text-decoration: none">
+    <button class="w3-btn w3-section w3-teal w3-ripple">Rate</button>
+</a>
+<a href="/change?_id=<%=r._id%>" style="text-decoration: none">
+  <button class="w3-btn w3-section w3-teal w3-ripple">Edit</button>
+</a>
+<a href="/remove?_id=<%=r._id%>" style="text-decoration: none">
+  <button class="w3-btn w3-section w3-teal w3-ripple">Delete</button>
+</a>
+<button class="w3-btn w3-section w3-teal w3-ripple" onclick="goBack()">Go Back</button>
+</div>
+<script>
+function goBack() {window.history.back();}
+</script>
 </body>
 </html>

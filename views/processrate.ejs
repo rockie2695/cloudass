@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title><%=state%></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+</head>
+<body>
+
+<header class="w3-container w3-<%=color%>">
+  <h1><%=state%></h1>
+</header>
+<div class="w3-container">
+
+<label class="w3-label w3-validate">You <%if (state=='error'){%>have <% } %>rated this restaurant</label>
+
+<br>
+<a href="/read">
+  <button class="w3-btn w3-section w3-teal w3-ripple">Go to read page</button>
+</a>
+</div>
+</body>
+</html>
