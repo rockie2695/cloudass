@@ -13,6 +13,7 @@ var SECRETKEY2 = 'Keep this to yourself';
 
 //database connection
 var MongoClient = require('mongodb').MongoClient;
+var mongodb = require('mongodb');
 var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
 // Use your own mlab account!!!
@@ -22,6 +23,7 @@ var mongourl = 'mongodb://rockie2695:26762714Rockie@ds057816.mlab.com:57816/rock
 var express = require('express');
 var fileUpload = require('express-fileupload');
 var app = express();
+var owner = "";
 
 //middlewares
 app.set('view engine', 'ejs');
@@ -116,6 +118,199 @@ app.post("/processreg", function(req,res) {
 	});	
 });
 
+//Q7 search
+app.get("/search", function(req, res){
+	if(req.session.id==null){
+		res.redirect("/login");
+	}else{
+	res.render("search.ejs");
+	}
+});
+//Q7
+app.post("/processSearch", function(req,res){
+	
+	if(req.body.requirement != null){
+		MongoClient.connect(mongourl, function(err,db){
+	assert.equal(err, null);
+	
+//var option = "name";
+
+var criteria = "";
+if(req.body.list == "name"){
+	criteria = {"name":req.body.requirement};
+}else if(req.body.list == "borough"){
+	criteria = {"borough":req.body.requirement};
+}else{
+	criteria = {"cuisine":req.body.requirement};
+}
+	
+	searchRestaurant(db, criteria, function(restaurant){
+
+	db.close();
+	console.log("Q7 disconnect");
+
+	res.render("read.ejs", {id:req.session.id, r:restaurant});
+	res.end();
+
+//assert.equal(err,null);
+});
+});//end connect
+	}//end if
+});//end post
+
+
+
+//Q5 delete
+app.get('/delete', function(req,res){
+	if(req.session.id==null){
+		res.redirect("/login");
+	}else{
+	
+	
+	
+		console.log("Q5 connect");
+
+var visiting_user = req.session.rest_owner;
+var visiting_rest_id = req.session.rest_id;
+//var criteria = {"_id": {"$oid":visiting_rest_id}};
+var criteria = visiting_rest_id; 
+var result = "";
+if(visiting_user == req.session.id){
+	
+	deleteRestaurant(criteria);
+	//var result = {"title":"Successful", "message": "Deleted"}
+result = {"title":"Successful", "message": "Deleted"};
+	res.render("response.ejs", {r:result});
+
+}else{
+	
+result = {"title":"Error", "message": "Your are not authorized to delete."};
+res.render("response.ejs", {r:result});
+}//end if
+		
+	
+}
+});//end delete
+
+//Q4
+app.get('/edit', function(req, res){
+//var result = "";
+	if(req.session.id==null){
+		res.redirect("/login");
+}else{
+	
+	if(req.session.id != req.session.rest_owner){
+		result = {"title":"error", "message":"Your are not authorized to update."};
+		res.render("response.ejs", {r:result});
+	}else{
+		res.render("update.ejs");
+}//end if
+}
+});//end edit
+
+//Q4
+function updateRestaurant(db, req, callback){
+	//var resultObj = new Object();
+	var jsonObj = {};
+	var o_id = req.session.rest_id;
+
+	if(req.body.cuisine != null){
+		//result.push({"cuisine": req.body.cuisine});
+		//resultObj.name = "cuisine";
+		//resultObj.value = "cuisine";
+		jsonObj["cuisine"] = req.body.cuisine;
+	}
+	if(req.files.sampleFile.data !=""){
+		
+		jsonObj["data"] = new Buffer(req.files.sampleFile.data).toString('base64');
+		jsonObj["mimitype"] = req.files.sampleFile.mimetype;
+	}
+	if(req.body.name != ""){
+		jsonObj["name"] = req.body.name;
+	}
+	if(req.body.borough != ""){
+		jsonObj["borough"] = req.body.borough;
+	}
+	if(req.body.corough != ""){
+		jsonObj["cuisine"] = req.body.cuisine;
+	}
+	if(req.body.street != ""){
+		jsonObj["street"] = req.body.street;
+	}
+	if(req.body.building != ""){
+		jsonObj["building"] = req.body.building;
+	}
+	if(req.body.zipcode != ""){
+		jsonObj["zipcode"] = req.body.zipcode;
+	}
+	if(req.body.lon != ""){
+		jsonObj["lon"] = req.body.lon;
+	}
+	if(req.body.lat != ""){
+		jsonObj["lat"] = req.body.lat;
+	}
+	
+
+
+	
+	
+	db.collection('cloudass_restaurant').update({_id: new mongodb.ObjectID(req.session.rest_id)}, {$set: jsonObj}, function(err, result){
+	
+	assert.equal(null, err);
+	
+	callback(result);
+});
+
+callback();
+}
+
+function deleteRestaurant(criteria){
+	MongoClient.connect(mongourl, function(err, db){
+		assert.equal(err, null);
+		
+		db.collection("cloudass_restaurant").remove({_id: new mongodb.ObjectID(criteria)}, function(err, result){
+	assert.equal(err, null);
+	
+	db.close();
+});//end remove
+});//end client
+}
+
+
+//Q7 searh
+function searchRestaurant(db, criteria, callback){
+	var restaurant = [];
+	db.collection('cloudass_restaurant').find(criteria, function(err, result){
+assert.equal(err, null);
+result.each(function(err, doc){
+	if(doc != null){
+		restaurant.push(doc);
+	}
+	else{
+		callback(restaurant);
+}
+
+});//result
+});
+}
+
+//q4 update
+app.post('/processUpdate', function(req, res){
+	
+	MongoClient.connect(mongourl, function(err, db){
+		assert.equal(null, err);
+		updateRestaurant(db, req, function(r, c){
+			db.close();
+			
+var result = {"title":"Successful", "message": "Updated"};
+	res.render("response.ejs", {r:result});
+//problem
+});//end update
+});//client
+	
+});
+
+
 app.get("/read",function(req,res){
 	console.log('now in /read session.id='+req.session.id);
 	if(req.session.id==null){
@@ -145,6 +340,9 @@ app.get('/display',function(req,res){
 			find1Restaurant(db,criteria,function(restaurant){
 				db.close();
 				console.log('Disconnected to mlab.com');
+
+	req.session.rest_owner = restaurant.owner;
+	req.session.rest_id = restaurant._id;
 				res.render("display.ejs",{r:restaurant});
 			});
 		});
