@@ -223,7 +223,7 @@ function updateRestaurant(db, req, callback){
 	if(req.files.sampleFile.data !=""){
 		
 		jsonObj["data"] = new Buffer(req.files.sampleFile.data).toString('base64');
-		jsonObj["mimitype"] = req.files.sampleFile.mimetype;
+		jsonObj["mimetype"] = req.files.sampleFile.mimetype;
 	}
 	if(req.body.name != ""){
 		jsonObj["name"] = req.body.name;
@@ -430,7 +430,7 @@ app.post('/api/create',function(req,res){
 			array={};
 			var objid=null;
 			if(err){
-				countstate="failed";
+				countstate="failed";type
 				array["status"]=countstate;
 				res.send(array);
 			}else{
@@ -470,7 +470,7 @@ app.post('/rate',function(req,res){
 				assert.equal(err,null);
 				console.log(result);
 				if(result[0]==null){
-					count="0";
+					count="0";type
 				}else{
 					count=result[0].count;
 				}
