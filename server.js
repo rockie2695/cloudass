@@ -17,7 +17,7 @@ var mongodb = require('mongodb');
 var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
 // Use your own mlab account!!!
-var mongourl = 'mongodb://rockie2695:26762714Rockie@ds057816.mlab.com:57816/rockie2695_mongodb';
+var mongourl = 'mongodb://rockie2695:password@ds057816.mlab.com:57816/rockie2695_mongodb';
 
 //express framework
 var express = require('express');
